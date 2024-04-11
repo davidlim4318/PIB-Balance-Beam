@@ -11,10 +11,10 @@ int angle_level = -11;   // deg, should be close to 0
 int distance_setpoint = 112;   // mm
 
 float K_P = 0.1;
-float K_I = 0.002;
-float K_D = 0.055;
+float K_I = 0.01;
+float K_D = 0.06;
 
-float filter_const = 50;   // ms
+float filter_const = 20;   // ms
 
 // General variables
 unsigned long time;
