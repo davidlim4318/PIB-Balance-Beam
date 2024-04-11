@@ -14,7 +14,7 @@ float K_P = 0.1;
 float K_I = 0.01;
 float K_D = 0.06;
 
-float filter_const = 20;   // ms
+float filter_const = 15;   // ms
 
 // General variables
 unsigned long time;
