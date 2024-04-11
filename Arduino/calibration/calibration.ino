@@ -7,14 +7,10 @@ Servo myServo;   // create servo object to control a servo, later attatched to D
 Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tunable parameters
-int angle_level = -11;   // deg, should be close to 0
-int distance_setpoint = 112;   // mm
+int angle_level = -10;   // deg, should be close to 0
+int distance_setpoint = 115;   // mm
 
-float K_P = 0.1;
-float K_I = 0;
-float K_D = 0;
-
-float filter_const = 50;   // ms
+float filter_const = 100;   // ms
 
 void setup() {
   Serial.begin(19200);
@@ -45,11 +41,6 @@ float distance_error;
 float distance_error_next;
 float distance_error_prev;
 
-float control_P;
-float control_I;
-float control_D;
-float control_total;
-
 void loop() {
   if (mySensor.isRangeComplete()) {
     distance_raw = mySensor.readRange();
@@ -61,14 +52,6 @@ void loop() {
     distance_error_prev = distance_error;
     distance_error = distance_error_next;
     distance_error_next = (1 - time_step / filter_const) * distance_error + time_step / filter_const * (distance_setpoint - distance_raw);
-
-    control_P = K_P * distance_error;
-    control_I = control_I + K_I * distance_error * time_step / 1000;
-    control_D = K_D * (distance_error_next - distance_error_prev) * 1000 / time_step / 2;
-
-    control_total = control_P ;//+ control_I + control_D;
-
-    myServo.writeMicroseconds(deg2micro(control_total + angle_level));
 
     print_data();
 
@@ -91,23 +74,6 @@ void print_data() {
 
   Serial.print("Error:");
   Serial.print(distance_error);
-  Serial.print(" ");
-/*
-  Serial.print("P:");
-  Serial.print(control_P);
-  Serial.print(" ");
-
-  Serial.print("I:");
-  Serial.print(control_I);
-  Serial.print(" ");
-
-  Serial.print("D:");
-  Serial.print(control_D);
-  Serial.print(" ");
-  */
-
-  Serial.print("Control:");
-  Serial.print(control_total);
   Serial.print(" ");
 
   Serial.println();
