@@ -11,10 +11,25 @@ int angle_level = -11;   // deg, should be close to 0
 int distance_setpoint = 112;   // mm
 
 float K_P = 0.1;
-float K_I = 0.001;
-float K_D = 0.05;
+float K_I = 0.002;
+float K_D = 0.055;
 
 float filter_const = 50;   // ms
+
+// General variables
+unsigned long time;
+unsigned long time_prev;
+unsigned long time_step;
+
+int distance_raw;
+float distance_error;
+float distance_error_next;
+float distance_error_prev;
+
+float control_P;
+float control_I;
+float control_D;
+float control_total;
 
 void setup() {
   Serial.begin(31250);
@@ -32,23 +47,15 @@ void setup() {
   }
   mySensor.setMeasurementTimingBudgetMicroSeconds(20000);
   mySensor.startRangeContinuous();
-
+  
+  while (! mySensor.isRangeComplete()) {
+    delay(1);
+  }
+  time = millis();
+  distance_raw = mySensor.readRange();
+  distance_error = distance_setpoint - distance_raw;
+  distance_error_next = distance_setpoint - distance_raw;
 }
-
-// General variables
-unsigned long time;
-unsigned long time_prev;
-unsigned long time_step;
-
-int distance_raw;
-float distance_error;
-float distance_error_next;
-float distance_error_prev;
-
-float control_P;
-float control_I;
-float control_D;
-float control_total;
 
 void loop() {
   if (mySensor.isRangeComplete()) {
