@@ -11,13 +11,13 @@ int angle_level = -11;   // deg, should be close to 0
 int distance_setpoint = 112;   // mm
 
 float K_P = 0.1;
-float K_I = 0;
-float K_D = 0;
+float K_I = 0.001;
+float K_D = 0.05;
 
 float filter_const = 50;   // ms
 
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(31250);
 
   while (! Serial) {
     delay(1);
@@ -52,11 +52,12 @@ float control_total;
 
 void loop() {
   if (mySensor.isRangeComplete()) {
-    distance_raw = mySensor.readRange();
-
     time_prev = time;
+    delay(constrain(25 - (millis() - time), 0, 5));
     time = millis();
     time_step = time - time_prev;
+
+    distance_raw = mySensor.readRange();
 
     distance_error_prev = distance_error;
     distance_error = distance_error_next;
@@ -66,7 +67,7 @@ void loop() {
     control_I = control_I + K_I * distance_error * time_step / 1000;
     control_D = K_D * (distance_error_next - distance_error_prev) * 1000 / time_step / 2;
 
-    control_total = control_P ;//+ control_I + control_D;
+    control_total = control_P + control_I + control_D;
 
     myServo.writeMicroseconds(deg2micro(control_total + angle_level));
 
@@ -92,7 +93,7 @@ void print_data() {
   Serial.print("Error:");
   Serial.print(distance_error);
   Serial.print(" ");
-/*
+
   Serial.print("P:");
   Serial.print(control_P);
   Serial.print(" ");
@@ -104,7 +105,6 @@ void print_data() {
   Serial.print("D:");
   Serial.print(control_D);
   Serial.print(" ");
-  */
 
   Serial.print("Control:");
   Serial.print(control_total);
