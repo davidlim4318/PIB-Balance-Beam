@@ -8,13 +8,13 @@ Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tunable parameters
 int angle_level = -11;   // deg, should be close to 0
-int distance_setpoint = 112;   // mm
+int distance_setpoint = 110;   // mm
 
-float K_P = 0.1;
-float K_I = 0.01;
-float K_D = 0.06;
+float K_P = 0.05;    // 0.1;
+float K_I = 0.005;   // 0.01;
+float K_D = 0.04;    // 0.06;
 
-float filter_const = 15;   // ms
+float filter_const = 15;   // in MILLIseconds
 
 // General variables
 unsigned long time;
