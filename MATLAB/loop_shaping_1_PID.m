@@ -32,14 +32,10 @@ subplot(2,n_col,n_col+col)
 bode(G_P)
 shg
 
-%% Lead Controller
-omega_target = 1.1;
-alpha = 200;
-p = omega_target*sqrt(alpha);
-z = omega_target/sqrt(alpha);
-D_lead = tf([1 z],[1 p]);
+%% D Controller
+K_d = 0.04;
 
-D1 = D_lead;
+D1 = tf([K_d 0],1);
 
 col = 2;
 figure(1)
@@ -59,14 +55,10 @@ shg
 
 D2 = D1;
 
-%% Lag Controller
-omega_target = 0.001;
-alpha = 1/200;
-p = omega_target*sqrt(alpha);
-z = omega_target/sqrt(alpha);
-D_lag = tf([1 z],[1 p]);
+%% PD Controller
+K_p = 0.05;
 
-D2 = D1*D_lag;
+D2 = tf([K_d K_p],1);
 
 col = 3;
 figure(1)
@@ -87,12 +79,10 @@ shg
 
 D3 = D2;
 
-%% Low-Pass Filter
-omega_c = 50;
+%% PID Controller
+K_i = 0.005;
 
-D_lpf = tf(omega_c,[1 omega_c]);
-
-D3 = D2*D_lpf;
+D3 = tf([K_d K_p K_i],[1 0]);
 
 col = 4;
 figure(1)
@@ -112,23 +102,21 @@ bode(D2)
 bode(D3)
 shg
 
-%% Adjust Gain
-omega_target = 1.7;
+D4 = D3;
 
-K = 1/abs(freqresp(G_P*D3,omega_target));
-D4 = K*D3;
+%% Low-Pass Filter
+omega_c = 1/0.015;
 
-poles = rlocus(G_P*D3,K);
+D_lpf = tf(omega_c,[1 omega_c]);
+
+D4 = D3*D_lpf;
 
 col = 4;
 figure(1)
 subplot(2,n_col,col)
-rlocus(G_P*D3)
+rlocus(G_P*D4)
 axis equal
-hold on
-plot(real(poles),imag(poles),'r*')
-hold off
-
+shg
 subplot(2,n_col,n_col+col)
 bode(G_P*D4)
 shg
@@ -194,16 +182,16 @@ subplot(2,2,4)
 step(S_u1,tlim)
 shg
 
-%% Difference Equations for Controller, Low-Pass Filter and, K
+%% Difference Equations for Controller and Low-Pass Filter
 h = 0.025;
-opts = c2dOptions('PrewarpFrequency',omega_target);
+opts = c2dOptions('PrewarpFrequency',1);
 
-D_2_z = c2d(D2,h,opts)
+D_z = c2d(D4,h,opts)
 
 D_lpf_z = c2d(D_lpf,h)
 
 syms z U(z) E(z) theta_k x_k
-[num, den] = tfdata(D_2_z);
+[num, den] = tfdata(D_z);
 eqn = poly2sym(cell2mat(num), z)*E(z) == poly2sym(cell2mat(den), z)*U(z);
 diff_eqn = vpa(iztrans(eqn))
 
@@ -211,13 +199,9 @@ diff_eqn = vpa(iztrans(eqn))
 eqn = poly2sym(cell2mat(num), z)*E(z) == poly2sym(cell2mat(den), z)*U(z);
 diff_eqn_lpf = vpa(iztrans(eqn))
 
-K
-
 figure(4)
 clf
-hold on
-bode(D_2_z)
-bode(D_lpf_z*D_2_z)
+bode(D_z)
 
 %%
-save('loop_shaping_1')
+save('loop_shaping_1_PID')
