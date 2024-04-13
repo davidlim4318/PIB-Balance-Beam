@@ -51,12 +51,6 @@ subplot(2,n_col,n_col+col)
 bode(G_P*D1)
 shg
 
-figure(2)
-clf
-hold on
-bode(D1)
-shg
-
 D2 = D1;
 
 %% Lag Controller
@@ -78,13 +72,6 @@ subplot(2,n_col,n_col+col)
 bode(G_P*D2)
 shg
 
-figure(2)
-clf
-hold on
-bode(D1)
-bode(D2)
-shg
-
 D3 = D2;
 
 %% Low-Pass Filter
@@ -102,14 +89,6 @@ axis equal
 shg
 subplot(2,n_col,n_col+col)
 bode(G_P*D3)
-shg
-
-figure(2)
-clf
-hold on
-bode(D1)
-bode(D2)
-bode(D3)
 shg
 
 %% Adjust Gain
@@ -140,7 +119,6 @@ bode(D1)
 bode(D2)
 bode(D3)
 bode(D4)
-shg
 
 %% Closed Loop
 T = G_P*D4/(1+G_P*D4);
@@ -220,4 +198,4 @@ bode(D_2_z)
 bode(D_lpf_z*D_2_z)
 
 %%
-save('loop_shaping_1')
+% save('loop_shaping_1')
