@@ -24,11 +24,11 @@ float control0;
 float control1;
 float control;
 
-float K = 0.6541;
-float a0 = 0.6778;
-float a1 = -1.678;
-float b0 = 0.9981;
-float b1 = -1.998;
+float K =   1.999608; // 0.6541;
+float a0 =  0.346203; // 0.6778;
+float a1 = -1.346156; // -1.678;
+float b0 =  0.988007; // 0.9981;
+float b1 = -1.987960; // -1.998;
 float c0 = 0.2865;
 
 void setup() {
