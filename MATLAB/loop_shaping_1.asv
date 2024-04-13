@@ -33,7 +33,7 @@ bode(G_P)
 shg
 
 %% Lead Controller
-omega_target = 1.1;
+omega_target = 1;
 alpha = 200;
 p = omega_target*sqrt(alpha);
 z = omega_target/sqrt(alpha);
@@ -54,8 +54,8 @@ shg
 D2 = D1;
 
 %% Lag Controller
-omega_target = 0.001;
-alpha = 1/200;
+omega_target = 0.005;
+alpha = 0.1;
 p = omega_target*sqrt(alpha);
 z = omega_target/sqrt(alpha);
 D_lag = tf([1 z],[1 p]);
@@ -92,7 +92,7 @@ bode(G_P*D3)
 shg
 
 %% Adjust Gain
-omega_target = 1.7;
+omega_target = 2.5;
 
 K = 1/abs(freqresp(G_P*D3,omega_target));
 D4 = K*D3;
@@ -119,6 +119,7 @@ bode(D1)
 bode(D2)
 bode(D3)
 bode(D4)
+shg
 
 %% Closed Loop
 T = G_P*D4/(1+G_P*D4);
@@ -146,7 +147,7 @@ step(S_u,tlim)
 shg
 
 %% Test With Different Transfer Function
-G1 = tf(60,[1 0 0]);
+G1 = tf(40,[1 0.0 0]);
 G_P1 = G1*P_pade;
 T1 = G_P1*D4/(1+G_P1*D4);
 
@@ -198,4 +199,4 @@ bode(D_2_z)
 bode(D_lpf_z*D_2_z)
 
 %%
-% save('loop_shaping_1')
+save('loop_shaping_1')
