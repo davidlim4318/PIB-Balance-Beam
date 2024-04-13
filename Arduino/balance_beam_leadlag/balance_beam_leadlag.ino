@@ -8,13 +8,7 @@ Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tunable parameters
 int angle_level = -11;   // deg, should be close to 0
-int distance_setpoint = 110;   // mm
-
-float K_P = 0.05;    // 0.1;
-float K_I = 0.005;   // 0.01;
-float K_D = 0.04;    // 0.06;
-
-float filter_const = 15;   // in MILLIseconds
+int distance_setpoint = 112;   // mm
 
 // General variables
 unsigned long time;
@@ -22,14 +16,20 @@ unsigned long time_prev;
 unsigned long time_step;
 
 int distance_raw;
+float distance_error0;
+float distance_error1;
 float distance_error;
-float distance_error_next;
-float distance_error_prev;
 
-float control_P;
-float control_I;
-float control_D;
-float control_total;
+float control0;
+float control1;
+float control;
+
+float K = 0.6541;
+float a0 = 0.6778;
+float a1 = -1.678;
+float b0 = 0.9981;
+float b1 = -1.998;
+float c0 = 0.2865;
 
 void setup() {
   Serial.begin(31250);
@@ -48,6 +48,7 @@ void setup() {
   mySensor.setMeasurementTimingBudgetMicroSeconds(20000);
   mySensor.startRangeContinuous();
   
+  /*
   while (! mySensor.isRangeComplete()) {
     delay(1);
   }
@@ -55,6 +56,7 @@ void setup() {
   distance_raw = mySensor.readRange();
   distance_error = distance_setpoint - distance_raw;
   distance_error_next = distance_setpoint - distance_raw;
+  */
 }
 
 void loop() {
@@ -66,19 +68,17 @@ void loop() {
 
     distance_raw = mySensor.readRange();
 
-    distance_error_prev = distance_error;
-    distance_error = distance_error_next;
-    distance_error_next = (1 - time_step / filter_const) * distance_error + time_step / filter_const * (distance_setpoint - distance_raw);
-
-    control_P = K_P * distance_error;
-    control_I = control_I + K_I * distance_error * time_step / 1000;
-    control_D = K_D * (distance_error_next - distance_error_prev) * 1000 / time_step / 2;
-
-    control_total = control_P + control_I + control_D;
-
-    myServo.writeMicroseconds(deg2micro(control_total + angle_level));
+    myServo.writeMicroseconds(deg2micro(control + angle_level));
 
     print_data();
+
+    distance_error0 = distance_error1;
+    distance_error1 = distance_error;
+    distance_error = (1 - c0) * (distance_setpoint - distance_raw) + c0 * distance_error1;
+
+    control0 = control1;
+    control1 = control;
+    control = K * ( b0 * distance_error0 + b1 * distance_error1 + distance_error ) - a0 * control0 - a1 * control1;
 
   }
 }
@@ -101,20 +101,8 @@ void print_data() {
   Serial.print(distance_error);
   Serial.print(" ");
 
-  Serial.print("P:");
-  Serial.print(control_P);
-  Serial.print(" ");
-
-  Serial.print("I:");
-  Serial.print(control_I);
-  Serial.print(" ");
-
-  Serial.print("D:");
-  Serial.print(control_D);
-  Serial.print(" ");
-
   Serial.print("Control:");
-  Serial.print(control_total);
+  Serial.print(control);
   Serial.print(" ");
 
   Serial.println();
