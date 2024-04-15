@@ -24,10 +24,15 @@ float control0;
 float control1;
 float control;
 
-float K =   1.999608; // 0.6541;
-float a0 =  0.346203; // 0.6778;
+// Decent (low amplitude oscillations): 
+// float K =   1.999608; float a0 =  0.346203; float a1 = -1.346156; float b0 =  0.988007; float b1 = -1.987960;
+// Underdamped: 
+// float K =   0.385211; float a0 =  0.92398568; float a1 = -1.92398554; float b0 =  0.96926025; float b1 = -1.96924950;
+
+float K =   1.4; //  0.6541;
+float a0 =  0.346203; //  0.6778;
 float a1 = -1.346156; // -1.678;
-float b0 =  0.988007; // 0.9981;
+float b0 =  0.988007; //  0.9981;
 float b1 = -1.987960; // -1.998;
 float c0 = 0.2865;
 
