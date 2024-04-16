@@ -37,7 +37,7 @@ float b1 = -1.987960; // -1.998;
 float c0 = 0.2865;
 
 void setup() {
-  Serial.begin(31250);
+  Serial.begin(115200);
 
   while (! Serial) {
     delay(1);

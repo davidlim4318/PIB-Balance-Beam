@@ -1,18 +1,26 @@
+// Balance Beam Proportional-Integral-Derivative (PID) Controller Script
+
+// Libraries
 #include <Wire.h>
 #include <Servo.h>
 #include <Adafruit_VL53L0X.h>
 
 // Objects
-Servo myServo;   // create servo object to control a servo, later attatched to D9
+Servo myServo;
 Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tunable parameters
 int angle_level = -11;   // deg, should be close to 0
-int distance_setpoint = 112;   // mm
+int distance_setpoint = 107;   // mm
 
-float K_P = 0.04;    // 0.1;
+int distance_safe = 30;
+int cycles;
+int cycles_safe = 60;   // 40 is 1s
+bool stop;
+
+float K_P = 0.12;    // 0.1;
 float K_I = 0.01;   // 0.01;
-float K_D = 0.04;    // 0.06;
+float K_D = 0.09;    // 0.06;
 
 float filter_const = 15;   // in MILLIseconds
 
@@ -32,7 +40,7 @@ float control_D;
 float control_total;
 
 void setup() {
-  Serial.begin(31250);
+  Serial.begin(115200);
 
   while (! Serial) {
     delay(1);
@@ -70,16 +78,28 @@ void loop() {
     distance_error = distance_error_next;
     distance_error_next = (1 - time_step / filter_const) * distance_error + time_step / filter_const * (distance_setpoint - distance_raw);
 
-    control_P = K_P * distance_error;
-    control_I = control_I + K_I * distance_error * time_step / 1000;
-    control_D = K_D * (distance_error_next - distance_error_prev) * 1000 / time_step / 2;
-
+    if (cycles <= cycles_safe) {
+      control_P = K_P * distance_error;
+      control_I = control_I + K_I * distance_error * time_step / 1000;
+      control_D = K_D * (distance_error_next - distance_error_prev) * 1000 / time_step / 2;
+    }
+    else {
+      control_P = 0;
+      control_D = 0;
+    }
     control_total = control_P + control_I + control_D;
-
     myServo.writeMicroseconds(deg2micro(control_total + angle_level));
 
     print_data();
 
+    if ( abs( distance_error ) <= distance_safe ) {
+      if (cycles <= cycles_safe) {
+        cycles++;
+      }
+    }
+    else {
+      cycles = 0;
+    }
   }
 }
 
@@ -115,6 +135,10 @@ void print_data() {
 
   Serial.print("Control:");
   Serial.print(control_total);
+  Serial.print(" ");
+
+  Serial.print("Cycles:");
+  Serial.print(cycles);
   Serial.print(" ");
 
   Serial.println();
