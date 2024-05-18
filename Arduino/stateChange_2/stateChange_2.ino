@@ -62,10 +62,10 @@ void setup() {
   }
 
   // Serial setup
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Servo setup
-  myservo.attach(5);
+  myservo.attach(6);
   myservo.write(levang);
 
   //Sensor setup
@@ -74,6 +74,7 @@ void setup() {
     while (1)
       ;
   }
+
   mySensor.setMeasurementTimingBudgetMicroSeconds(20000);  // set sensor timing budget to 20 ms
   mySensor.startRangeContinuous();                         // intialize "continuous" sensor output
 
@@ -111,9 +112,9 @@ void loop() {
     //remove in final code
     Serial.print(states[index]);
     Serial.print(": ");
-    Serial.print(digitalRead(2));
-    Serial.print(" ");
     Serial.print(digitalRead(3));
+    Serial.print(" ");
+    Serial.print(digitalRead(4));
     Serial.println(" ");
     Serial.print("Angle: ");
     //up to here
@@ -143,9 +144,9 @@ void loop() {
 
     //mapping potentiometer readings
     //from 0-100
-    kp = map(analogRead(A1), 10, 1023, 0, 100);
-    ki = map(analogRead(A2), 10, 1023, 0, 100);
-    kd = map(analogRead(A3), 10, 1023, 0, 100);
+    kp = map(analogRead(A2), 10, 1023, 0, 100);
+    ki = map(analogRead(A1), 10, 1023, 0, 100);
+    kd = map(analogRead(A0), 10, 1023, 0, 100);
     kp = kp / 1000;
     ki = ki / 100000;
 
@@ -219,11 +220,11 @@ void loop() {
 
     //printing out raw potentiometer values
     //printing out mapped potentiometer values
-    Serial.print(analogRead(A1));
-    Serial.print(" ");
     Serial.print(analogRead(A2));
     Serial.print(" ");
-    Serial.print(analogRead(A3));
+    Serial.print(analogRead(A1));
+    Serial.print(" ");
+    Serial.print(analogRead(A0));
     Serial.println(" ");
     Serial.print(kp, 4);
     Serial.print(" ");
@@ -258,7 +259,7 @@ void changeState() {
 
   //check if button is pressed
   //and if any other button is being pressed at the same time
-  if (digitalRead(4) == 0 && (digitalRead(4) != digitalRead(2) || digitalRead(4) != digitalRead(3))) {
+  if (digitalRead(2) == 0 && (digitalRead(2) != digitalRead(3) || digitalRead(2) != digitalRead(4))) {
     index++;
     if (index > 4) {
       index = 3;
@@ -281,20 +282,20 @@ void calibrateServo() {
 
   //check if both buttons are pressed or not pressed
   //does not allow both buttons to be pressed
-  if (digitalRead(2) != digitalRead(3)) {
+  if (digitalRead(3) != digitalRead(4)) {
 
     //check which button is being pressed
     //limits the manual levang calibration
     //to a certain range(+ or - 35)
-    if (digitalRead(2) == 0 && levang < 90 + 45) {
+    if (digitalRead(3) == 0 && levang < 90 + 45) {
       levang++;
       myservo.write(levang);
-      delay(0);
+      delay(100);
     }
-    if (digitalRead(3) == 0 && levang > 90 - 45) {
+    if (digitalRead(4) == 0 && levang > 90 - 45) {
       levang--;
       myservo.write(levang);
-      delay(0);
+      delay(100);
     }
   }
   Serial.println(levang);

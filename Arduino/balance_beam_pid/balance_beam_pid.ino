@@ -47,7 +47,7 @@ void setup() {
   }
 
   // Servo setup
-  myServo.attach(6);   // assign servo signal output to pin 6
+  myServo.attach(5);   // assign servo signal output to pin 6
   myServo.writeMicroseconds(deg2micro(angle_level));   // rotate the servo to the level angle
 
   // Sensor setup
