@@ -7,13 +7,13 @@ Servo myServo;   // create servo object to control a servo, later attatched to D
 Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tunable parameters
-int angle_level = -10;   // deg, should be close to 0
+int angle_level = -11;   // deg, should be close to 0
 int distance_setpoint = 115;   // mm
 
 float filter_const = 100;   // ms
 
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(115200);
 
   while (! Serial) {
     delay(1);

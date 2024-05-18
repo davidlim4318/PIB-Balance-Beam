@@ -10,17 +10,17 @@ Servo myServo;
 Adafruit_VL53L0X mySensor = Adafruit_VL53L0X();
 
 // Tuned parameters
-int angle_level = -11;   // level angle in degrees, should be close to 0
+int angle_level = -23;   // level angle in degrees, should be close to 0
 int distance_setpoint = 107;   // (mm)
 
 int error_limit = 30;   // acceptable distance error (mm)
 int cycle_limit = 60;   // minimum number of consecutive loop cycles within error limit to be considered "stable"
 
-float K_P = 0.12;   // proportional coefficient
+float K_P = 0.10;   // proportional coefficient
 float K_I = 0.01;   // integral coefficient
-float K_D = 0.09;   // derivative coefficient
+float K_D = 0.06;   // derivative coefficient
 
-float filter_const = 15;   // (ms)
+float filter_const = 25;   // (ms)
 
 // General variables
 unsigned long time;   // current time (mm)
