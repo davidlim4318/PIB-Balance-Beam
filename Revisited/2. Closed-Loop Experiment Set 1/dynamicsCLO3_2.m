@@ -1,0 +1,21 @@
+function [A,B,C,D,K] = dynamicsCLO3_2(par,Ts,aux)
+zG = par(1);
+pG = par(2);
+kG = par(3);
+G = zpk(zG,pG,kG,Ts);
+zH = par(4);
+pH = par(5);
+H = zpk(zH,pH,1,Ts);
+zF = aux(1);
+pF = [aux(2) aux(3)];
+kF = aux(4);
+F = zpk(zF,pF,kF,Ts);
+Gcl = minreal(G*F/(1 + G*F));
+Hcl = minreal(H/(1 + G*F));
+L = ss([Gcl Hcl]);
+A = L.A;
+B = L.B(:,1);
+C = L.C;
+D = L.D(1);
+K = L.B(:,2);
+end
